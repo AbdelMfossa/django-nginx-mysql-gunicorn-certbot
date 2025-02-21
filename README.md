@@ -34,8 +34,7 @@ La première étape cruciale dans le déploiement d’une application Django con
 
 1. Connectez-vous au serveur MySQL :
 ```
-sudo mysql
-mysql -u root -p
+sudo mysql -u root -p
 ```
 2. Créez la base de données :
 ```
