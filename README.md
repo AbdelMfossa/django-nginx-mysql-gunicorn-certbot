@@ -107,62 +107,50 @@ cd ..
 chown www-data: -R portefolio/
 ```
 7. Configurez Gunicorn :
-    * Créez `nano /etc/systemd/system/gunicorn.socket` :
+    * Crée un fichier service pour Gunicorn : `nano /etc/systemd/system/gunicorn_portefolio.service` :
         ```
         [Unit]
-        Description=gunicorn socket
-
-        [Socket]
-        ListenStream=/run/gunicorn.sock
-
-        [Install]
-        WantedBy=sockets.target
-        ```
-    * Créez `nano /etc/systemd/system/gunicorn.service` :
-        ```
-        [Unit]
-        Description=gunicorn daemon
-        Requires=gunicorn.socket
+        Description=Gunicorn application server for portefolio
         After=network.target
-
+         
         [Service]
-        User=root
+        User=root    # Remplace par ton utilisateur
         Group=www-data
         WorkingDirectory=/var/www/portefolio
-        ExecStart=/var/www/portefolio/env/bin/gunicorn \
-                --access-logfile - \
-                --workers 3 \
-                --bind unix:/run/gunicorn.sock \
-                portefolio.wsgi:application
-
+        ExecStart=/var/www/portefolio/venv/bin/gunicorn --workers 3 --bind unix:/var/www/portefolio/portefolio.sock portefolio.wsgi:application
+         
         [Install]
         WantedBy=multi-user.target
         ```
     * Activez et démarrez Gunicorn :
         ```
-        sudo systemctl start gunicorn.socket
-        sudo systemctl enable gunicorn.socket
-        sudo systemctl status gunicorn.socket
-        file /run/gunicorn.sock
         sudo systemctl daemon-reload
-        sudo systemctl restart gunicorn
+        sudo systemctl start gunicorn_portefolio
+        sudo systemctl status gunicorn_exam
+        sudo systemctl enable gunicorn_exam
         ```
 8. Configurez Nginx :
     * Créez un fichier de configuration pour votre domaine (`nano /etc/nginx/sites-available/abdelmfossa.com`) :
         ```
         server {
-            listen 80;
-            server_name abdelmfossa.com www.abdelmfossa.com;
-
-            location = /favicon.ico { access_log off; log_not_found off; }
-            location /static/ {
-                root /var/www/portefolio;
-            }
-
-            location / {
-                include proxy_params;
-                proxy_pass http://unix:/run/gunicorn.sock;
-            }
+          listen 80;
+          server_name abdelmfossa.com www.abdelmfossa.com;
+      
+          location = /favicon.ico { access_log off; log_not_found off; }
+          location /static/ {
+              root /var/www/portefolio; # Dossier contenant les fichiers statiques
+          }
+      
+          location /media/ {
+              root /var/www/portefolio; # Dossier contenant les fichiers uploadés
+          }
+      
+          location / {
+              include proxy_params;
+              proxy_pass http://unix:/var/www/portefolio/portefolio.sock;  # Utilise le socket Gunicorn
+          }
+      
+          client_max_body_size 50M;  # Augmenter la taille max des fichiers uploadés
         }
         ```
     * Activez la configuration :
@@ -180,7 +168,7 @@ chown www-data: -R portefolio/
 ```
 sudo systemctl restart gunicorn
 sudo systemctl daemon-reload
-sudo systemctl restart gunicorn.socket gunicorn.service
+sudo systemctl restart gunicorn_portefolio
 ```
 10. Vérifiez à nouveau la configuration Nginx et redémarrez-le :
 ```
