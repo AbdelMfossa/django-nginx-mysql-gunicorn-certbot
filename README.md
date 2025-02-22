@@ -44,11 +44,12 @@ CREATE DATABASE base;
 ```
 CREATE USER 'abdel'@'localhost' IDENTIFIED WITH mysql_native_password BY 'mot_de_passe';
 GRANT ALL PRIVILEGES ON base.* TO 'abdel'@'localhost' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON base.* TO 'abdel'@'%' WITH GRANT OPTION; // pour accès via l'extérieur
 FLUSH PRIVILEGES;
 ```
 4. Quittez MySQL :
 ```
-exit
+exit;
 ```
 [Lien d'exemple](https://www.digitalocean.com/community/tutorials/how-to-install-mysql-on-ubuntu-20-04)
 
