@@ -126,8 +126,8 @@ chown www-data: -R portefolio/
         ```
         sudo systemctl daemon-reload
         sudo systemctl start gunicorn_portefolio
-        sudo systemctl status gunicorn_exam
-        sudo systemctl enable gunicorn_exam
+        sudo systemctl status gunicorn_portefolio
+        sudo systemctl enable gunicorn_portefolio
         ```
 8. Configurez Nginx :
     * Créez un fichier de configuration pour votre domaine (`nano /etc/nginx/sites-available/abdelmfossa.com`) :
